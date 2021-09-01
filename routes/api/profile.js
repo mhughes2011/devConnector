@@ -204,4 +204,26 @@ router.put('/experience', [auth, [
 
 });
 
+// @route   DELETE api/profile/experience/:exp_id
+// @desc    Delete an experience from profile
+// @access  Private
+router.delete('/experience/:exp_id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({user: req.user.id});
+
+        // Get the remove index for the specific experience.  This goes through all of the experiences in the array and finds the one that matches the exp_id that was sent over through the request.
+        const removeIndex = profile.experience.map(item => item.id).indexOf(req.params.exp_id);
+
+        // Splice is used to remove the removeIndex variable and only 1 of them
+        profile.experience.splice(removeIndex, 1);
+        
+        await profile.save();
+
+        res.json(profile);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+})
+
 module.exports = router;
