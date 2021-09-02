@@ -226,4 +226,76 @@ router.delete('/experience/:exp_id', auth, async (req, res) => {
     }
 })
 
+// @route   PUT api/profile/education
+// @desc    Add profile education
+// @access  Private
+router.put('/education', [auth, [
+    body('school', 'School is required').not().isEmpty(),
+    body('degree', 'Degree is required').not().isEmpty(),
+    body('from', 'Starting Date is required').not().isEmpty(),
+    body('fieldofstudy', 'Field of Study Date is required').not().isEmpty()
+]], async (req, res) => {
+    const errors = validationResult(req);
+    if(!errors.isEmpty()) {
+        return res.status(400).json({errors: errors.array()});
+    }
+
+    const {
+        school,
+        degree,
+        fieldofstudy,
+        from,
+        to,
+        current,
+        description
+    } = req.body;
+
+    const newEdu = {
+        school: school,
+        degree: degree,
+        fieldofstudy: fieldofstudy,
+        from: from,
+        to: to,
+        current: current,
+        description: description
+    }
+
+    try {
+        // Get the profile you want to update via the user id from the token
+        const profile = await Profile.findOne({user: req.user.id});
+        // Education is an array and unshift adds the newEdu object to the front of the array
+        profile.education.unshift(newEdu);
+        // Save it to MongoDB
+        await profile.save();
+        // Send the profile object with the updated education information back to the front end via the response
+        res.json(profile);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+
+});
+
+// @route   DELETE api/profile/education/:edu_id
+// @desc    Delete an education from profile
+// @access  Private
+router.delete('/education/:edu_id', auth, async (req, res) => {
+    try {
+        const profile = await Profile.findOne({user: req.user.id});
+
+        // Get the remove index for the specific education.  This goes through all of the educations in the array and finds the one that matches the exp_id that was sent over through the request.
+        const removeIndex = profile.education.map(item => item.id).indexOf(req.params.edu_id);
+
+        // Splice is used to remove the removeIndex variable and only 1 of them
+        profile.education.splice(removeIndex, 1);
+        
+        await profile.save();
+
+        res.json(profile);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+})
+
 module.exports = router;
