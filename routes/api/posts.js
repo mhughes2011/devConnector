@@ -103,7 +103,61 @@ router.delete('/:id', auth, async (req, res) => {
     }
 });
 
+// @route   PUT api/posts/like/:id
+// @desc    Like a post
+// @access  Private
+router.put('/like/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
 
+        // Check if the post has already been liked by logged in user.  Checking to see if the post.likes array has a value equal to the user.id of the logged in user.  If it does it'll return the user.id which has a length greater than zero, and this will be true.
+        if(post.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
+            return res.status(400).json({msg: 'Post already liked'});
+        }
+
+        // If the logged in user hasn't already liked the post, add that user's id to the likes array tied to the post
+        post.likes.unshift({user: req.user.id});
+
+        // Save the post
+        await post.save();
+
+        // Send back the post with the array of likes
+        res.json(post.likes);
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+})
+
+// @route   PUT api/posts/unlike/:id
+// @desc    Unlike a post
+// @access  Private
+router.put('/unlike/:id', auth, async (req, res) => {
+    try {
+        const post = await Post.findById(req.params.id);
+
+        // Check if the post has already been liked by logged in user. Checking to see if the post.likes array has a value equal to the user.id of the logged in user.  If it doesn't it'll return zero, and this will be true.
+        if(post.likes.filter(like => like.user.toString() === req.user.id).length === 0) {
+            return res.status(400).json({msg: 'Post has not been liked'});
+        }
+
+        //  If the logged in user has already liked the post, remove that user's id from the likes array tied to the post. First, get the remove index. 
+        const removeIndex = post.likes.map(like => like.user.toString()).indexOf(req.user.id);
+
+        post.likes.splice(removeIndex, 1);
+
+        // Save the post
+        await post.save();
+
+        // Send back the post with the array of likes
+        res.json(post.likes);
+
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Server error');
+    }
+})
 
 
 module.exports = router;
