@@ -5,7 +5,8 @@ import {
     DELETE_ACCOUNT,
     GET_PROFILE,
     PROFILE_ERROR,
-    UPDATE_PROFILE
+    UPDATE_PROFILE,
+    CLEAR_PROFILE
 } from './types'
 
 // Get current user's profile
