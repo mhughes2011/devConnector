@@ -14,6 +14,7 @@ export const getPosts = () => async dispatch => {
             type: GET_POSTS,
             payload: res.data
         })
+        dispatch(setAlert('Posts are being retrieved...'))
     } catch (err) {
         dispatch({
             type: POST_ERROR,
