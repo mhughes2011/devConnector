@@ -1,0 +1,7 @@
+{
+    "mongoURI": "mongodb+srv://devConnect:dev123@cluster0.zka6f.mongodb.net/myFirstDatabase?retryWrites=true&w=majority",
+    "jwtSecret": "theroundtable",
+    "githubClientID": "Iv1.9cbdef0815752a9d",
+    "githubClientSecret": "dfc6bd8b2cdfb909c81a417f22ec1cc505b155e3",
+    "githubprivatekey": "SHA256:uaPxEEVO4iAnejzXGfTXuCijmL4ToGyvZYsrEt83ecg="
+}
